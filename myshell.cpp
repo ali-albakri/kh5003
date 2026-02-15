@@ -13,7 +13,10 @@ int main() {
     string cmd;
 
     while (true) {
-        cout << "theshell>";
+        char cwd[256];
+        getcwd(cwd, sizeof(cwd));
+        cout << cwd << "> ";
+
         getline(cin, cmd);
 
         char ccmd[256];
@@ -23,7 +26,7 @@ int main() {
             char *args[32];
             int x = 0;
             char *part = strtok(ccmd, " ");
-            while (part != nullptr && x < 63) {
+            while (part != nullptr && x < 31) {
                 args[x++] = part;
                 part = strtok(nullptr, " ");
             }
@@ -60,9 +63,9 @@ int main() {
         } else if (strcmp(args[0], "dir") == 0) {
             const char *pathdir;
             if (args[1] != nullptr) {
-                pathdir = args[1];  // use the directory the user typed
+                pathdir = args[1];
             } else {
-                pathdir = ".";       // default to current directory
+                pathdir = ".";
             }
 
             DIR *dir = opendir(pathdir);
