@@ -1,0 +1,6 @@
+echo Batch Testing
+cd
+date
+whoami
+ls
+quit
