@@ -32,38 +32,42 @@ if (argc == 2) {
 
 
         char ccmd[256];
-            strncpy(ccmd, cmd.c_str(), sizeof(ccmd));
-            ccmd[sizeof(ccmd)-1] = '\0';
+        strncpy(ccmd, cmd.c_str(), sizeof(ccmd));
+        ccmd[sizeof(ccmd)-1] = '\0';
 
-            char *args[32];
-            int x = 0;
-            char *part = strtok(ccmd, " ");
-            while (part != nullptr && x < 31) {
-                args[x++] = part;
-                part = strtok(nullptr, " ");
-            }
-            args[x] = nullptr;
+        if (cmd.length() >= sizeof(ccmd)) {
+            cout << "Command exceeds limit!" << endl;
+            continue;
+        }
 
-            if (args[0] == nullptr) {
-                continue;
-            }
+        char *args[32];
+        int x = 0;
+        char *part = strtok(ccmd, " ");
+        while (part != nullptr && x < 31) {
+            args[x++] = part;
+            part = strtok(nullptr, " ");
+        }
+        args[x] = nullptr;
+
+        bool backgr = false;
+
+        if (x > 0 && strcmp(args[x-1], "&") == 0) {
+            backgr = true;
+            args[x-1] = nullptr;
+        }
+
+        if (args[0] == nullptr) {
+            continue;
+        }
 
         // Internal Shell commands
-        if (cmd == "quit") {
+        if (strcmp(args[0], "quit") == 0){
             if (!batch) {
                 cout << "Exiting..." << endl;
             }
             break;
         }  else if (strcmp(args[0], "help") == 0) {
-            cout << "Simple CS shell commands:" << endl
-                 << "cd X            | print current X or change current directory" << endl
-                 << "dir X           | list directory X's contents" << endl
-                 << "environ         | list environment variables" << endl
-                 << "set X Y         | set value Y of variable X" << endl
-                 << "echo X          | prints X" << endl
-                 << "pause           | pause and wait for Enter" << endl
-                 << "quit            | quits shell" << endl
-                 << "Note: Other external commands work." << endl;
+            system("more README.md");
             continue; }
             else if (strcmp(args[0], "cd") == 0) {
                 if (args[1] == nullptr) {
@@ -140,7 +144,10 @@ if (argc == 2) {
             execvp(args[0], args);
             perror("Execvp Failed");
         } else {
-            wait(NULL);
+            if (!backgr) {
+                wait(NULL);
+            }
         }
     }
+    return 0;
 }
