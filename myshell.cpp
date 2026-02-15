@@ -9,15 +9,27 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char *argv[]) {
     string cmd;
+    bool batch = false;
+
+if (argc == 2) {
+    freopen(argv[1], "r", stdin);
+    batch = true;
+}
 
     while (true) {
         char cwd[256];
         getcwd(cwd, sizeof(cwd));
-        cout << cwd << "> ";
+        if (!batch) {
+            cout << cwd << "> ";
+        }
 
-        getline(cin, cmd);
+
+        if (!getline(cin, cmd)) {
+            break;
+        }
+
 
         char ccmd[256];
             strncpy(ccmd, cmd.c_str(), sizeof(ccmd));
@@ -32,9 +44,15 @@ int main() {
             }
             args[x] = nullptr;
 
+            if (args[0] == nullptr) {
+                continue;
+            }
+
         // Internal Shell commands
         if (cmd == "quit") {
-            cout << "Exiting..." << endl;
+            if (!batch) {
+                cout << "Exiting..." << endl;
+            }
             break;
         }  else if (strcmp(args[0], "help") == 0) {
             cout << "Simple CS shell commands:" << endl
@@ -56,7 +74,9 @@ int main() {
                 if (chdir(args[1]) != 0) {
                     perror("CD Error");
                 } else {
-                    setenv("PWD", args[1], 1);
+                        char cwdnew[256];
+                        getcwd(cwdnew, sizeof(cwdnew));
+                        setenv("PWD", cwdnew, 1);
                 }
             }
             continue;
